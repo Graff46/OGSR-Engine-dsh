@@ -183,7 +183,6 @@ public:
     IC const CBoneRotation& body_orientation() const;
     void update_path();
     virtual void move_along_path(CPHMovementControl* movement_control, Fvector& dest_position, float time_delta);
-    virtual void remove_links(CObject *object) {};
 
     IC float speed() const;
     float speed(CPHMovementControl* movement_control) const;
@@ -222,12 +221,11 @@ public:
 
 protected:
     bool move_along_path() const;
-    bool move_along_path( const Fvector& pos ) const;
 
 protected:
     Fvector path_position(const float& time_to_check);
     Fvector path_position(const float& velocity, const Fvector& position, const float& time_delta,
-        u32& current_travel_point, float& dist, float& dist_to_target, Fvector& dir_to_target, float& desirable_dist);
+        u32& current_travel_point, float& dist, float& dist_to_target, Fvector& dir_to_target);
 
 protected:
     virtual CRestrictedObject* create_restricted_object();

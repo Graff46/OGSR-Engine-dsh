@@ -551,4 +551,8 @@ bool _valid(const _box3<T>& c)
     return _valid(c.min) && _valid(c.max);
 }
 
-#endif
+template <class T>
+bool _valid(const _box3<T>& c)
+{
+    return _valid(c.min) && _valid(c.max);
+}

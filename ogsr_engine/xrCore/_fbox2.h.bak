@@ -1,6 +1,9 @@
 #pragma once
+<<<<<<< HEAD
+=======
 #ifndef __FBOX2
 #define __FBOX2
+>>>>>>> df1edaad... Обход сталкерами физ. объектов и открывание/закрывание дверей из ЗП
 
 template <class T>
 class _box2
@@ -361,5 +364,8 @@ bool _valid(const _box2<T>& c)
 {
     return _valid(c.min) && _valid(c.max);
 }
+<<<<<<< HEAD
+=======
 
 #endif
+>>>>>>> df1edaad... Обход сталкерами физ. объектов и открывание/закрывание дверей из ЗП

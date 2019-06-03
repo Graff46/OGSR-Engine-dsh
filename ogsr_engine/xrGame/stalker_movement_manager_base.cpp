@@ -518,7 +518,7 @@ void stalker_movement_manager_base::set_nearest_accessible_position()
 
 void stalker_movement_manager_base::set_nearest_accessible_position(Fvector desired_position, u32 level_vertex_id)
 {
-	if ( !ai().level_graph().valid_vertex_position( desired_position ) || !ai().level_graph().inside( level_vertex_id, desired_position ) )
+	if (!ai().level_graph().inside(level_vertex_id,desired_position))
 		desired_position		= ai().level_graph().vertex_position(level_vertex_id);
 	else
 		desired_position.y		= ai().level_graph().vertex_plane_y(level_vertex_id,desired_position.x,desired_position.z);
@@ -583,7 +583,7 @@ void stalker_movement_manager_base::on_travel_point_change	(const u32 &previous_
 void stalker_movement_manager_base::on_restrictions_change	()
 {
 	inherited::on_restrictions_change	();
-	if ( !object().getDestroy() && m_current.desired_position() && ( !ai().level_graph().valid_vertex_position( *m_current.desired_position() ) || !restrictions().accessible( *m_current.desired_position() ) ) )
+	if (m_current.desired_position() && !restrictions().accessible(!m_current.desired_position()))
 		set_nearest_accessible_position	();
 }
 

@@ -262,11 +262,8 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
 	}
 
 	auto stalker = smart_cast<CAI_Stalker*>(weapon_magazined->H_Parent());
-	if ( stalker && stalker->hammer_is_clutched() ) {
-	  auto active_item = smart_cast<CWeaponMagazined*>( stalker->inventory().ActiveItem() );
-	  if ( active_item && weapon_magazined == active_item )
-	    return;
-	}
+	if (stalker && stalker->hammer_is_clutched())
+		return;
 
 	weapon_magazined->UnloadMagazine(spawn_ammo);
 	if (unload_gl)
@@ -366,12 +363,6 @@ void CScriptGameObject::GiveMoney(int money)
 
 
 	pOurOwner->set_money		(pOurOwner->get_money() + money, true );
-}
-
-void CScriptGameObject::SetMoney( u32 money ) {
-  CInventoryOwner* pOurOwner = smart_cast<CInventoryOwner*>( &object() );
-  ASSERT_FMT( pOurOwner, "[%s]: %s not an CInventoryOwner", __FUNCTION__, object().Name());
-  pOurOwner->set_money( money, true );
 }
 //////////////////////////////////////////////////////////////////////////
 

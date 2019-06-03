@@ -13,7 +13,6 @@
 #include "level.h"
 #include "custommonster.h"
 #include "IColisiondamageInfo.h"
-#include "ai\monsters\monster_velocity_space.h"
 
 #include "profiler.h"
 
@@ -85,11 +84,6 @@ void CMovementManager::apply_collision_hit(CPHMovementControl* movement_control)
 
 bool CMovementManager::move_along_path() const
 {
-  return move_along_path( object().Position() );
-}
-
-bool CMovementManager::move_along_path( const Fvector& pos ) const
-{
     if (!enabled())
         return (false);
 
@@ -102,7 +96,7 @@ bool CMovementManager::move_along_path( const Fvector& pos ) const
     if (detail().path().empty())
         return (false);
 
-    if (detail().completed(pos, true))
+    if (detail().completed(object().Position(), true))
         return (false);
 
     if (detail().curr_travel_point_index() >= detail().path().size() - 1)
@@ -115,7 +109,7 @@ bool CMovementManager::move_along_path( const Fvector& pos ) const
 }
 
 Fvector CMovementManager::path_position(const float& velocity, const Fvector& position, const float& time_delta,
-    u32& current_travel_point, float& dist, float& dist_to_target, Fvector& dir_to_target, float& desirable_dist)
+    u32& current_travel_point, float& dist, float& dist_to_target, Fvector& dir_to_target)
 {
     VERIFY(current_travel_point < (detail().path().size() - 1));
 
@@ -153,31 +147,24 @@ Fvector CMovementManager::path_position(const float& velocity, const Fvector& po
     // дистанция до целевой точки
     dist_to_target = dir_to_target.magnitude();
 
-    desirable_dist = 0.f;
     while (dist > dist_to_target)
     {
         dest_position.set(target);
         dist -= dist_to_target;
-        desirable_dist += dist_to_target;
 
         if (current_travel_point + 1 >= detail().path().size())
         {
             //			VERIFY				(dist <= dist_to_target);
-            dir_to_target.set( 0.f, 0.f, 0.f );
-            dist = 0.f;
-            dist_to_target = 0.f;
             return (dest_position);
         }
 
         ++current_travel_point;
-/*
         if ((current_travel_point + 1) >= detail().path().size())
         {
             //			VERIFY				(dist <= dist_to_target);
             dist = 0.f;
             return (dest_position);
         }
-*/
 
         target.set(detail().path()[current_travel_point + 1].position);
         dir_to_target.sub(target, dest_position);
@@ -201,10 +188,10 @@ Fvector CMovementManager::path_position(const float& time_to_check)
 
     Fvector dir_to_target;
     float dist_to_target;
-    float dist, desirable_dist;
+    float dist;
     u32 current_travel_point = detail().m_current_travel_point;
     return (path_position(old_desirable_speed(), object().Position(), time_to_check, current_travel_point, dist,
-        dist_to_target, dir_to_target, desirable_dist));
+        dist_to_target, dir_to_target));
 }
 
 void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fvector& dest_position, float time_delta)
@@ -250,7 +237,7 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
         return;
 
     float desirable_speed = old_desirable_speed(); // желаемая скорость объекта
-    float desirable_dist; // = desirable_speed * time_delta;
+    float desirable_dist = desirable_speed * time_delta;
     float dist;
 
     // position_computation
@@ -258,7 +245,7 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
     float dist_to_target;
     u32 current_travel_point = detail().m_current_travel_point;
     dest_position = path_position(old_desirable_speed(), object().Position(), time_delta, current_travel_point, dist,
-        dist_to_target, dir_to_target, desirable_dist);
+        dist_to_target, dir_to_target);
 
     // Lain: added steering behaviour
     // 	Fvector target;
@@ -276,7 +263,6 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
         on_travel_point_change(detail().m_current_travel_point);
     detail().m_current_travel_point = current_travel_point;
 
-/*
     if (dist_to_target < EPS_L)
     {
 #pragma todo("Dima to ? : is this correct?")
@@ -289,7 +275,6 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
         // curr_tp=%d",Device.dwFrame,*object().cName(),detail().m_current_travel_point);
         return;
     }
-*/
     //	Msg					("[%6d][%s] curr_tp=%d",Device.dwFrame,*object().cName(),detail().m_current_travel_point);
 
     // Физика устанавливает новую позицию
@@ -302,12 +287,8 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
     VERIFY(dist >= 0.f);
     VERIFY(dist_to_target >= 0.f);
     //	VERIFY				(dist <= dist_to_target);
-    if ( !fis_zero( dist_to_target ) ) {
-      motion.mul( dir_to_target, dist / dist_to_target );
-      dest_position.add( motion );
-    }
-    else
-      motion.set( 0.f, 0.f, 0.f );
+    motion.mul(dir_to_target, dist / dist_to_target);
+    dest_position.add(motion);
 
     Fvector velocity = dir_to_target;
     velocity.normalize_safe();
@@ -365,7 +346,7 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
         */
 
     // установить скорость
-    float real_motion = motion.magnitude() + desirable_dist; // - dist;
+    float real_motion = motion.magnitude() + desirable_dist - dist;
     float real_speed = real_motion / time_delta;
 
     m_speed = 0.5f * desirable_speed + 0.5f * real_speed;

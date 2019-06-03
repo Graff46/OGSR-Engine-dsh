@@ -1,6 +1,9 @@
 #pragma once
+<<<<<<< HEAD
+=======
 #ifndef __FBOX
 #define __FBOX
+>>>>>>> df1edaad... Обход сталкерами физ. объектов и открывание/закрывание дверей из ЗП
 #include "_vector3d.h"
 
 template <class T>
@@ -541,6 +544,11 @@ public:
 
 using Fbox = _box3<float>;
 using Fbox3 = _box3<float>;
+<<<<<<< HEAD
+
+using Dbox = _box3<double>;
+using Dbox3 = _box3<double>;
+=======
 
 using Dbox = _box3<double>;
 using Dbox3 = _box3<double>;
@@ -550,5 +558,10 @@ bool _valid(const _box3<T>& c)
 {
     return _valid(c.min) && _valid(c.max);
 }
+>>>>>>> df1edaad... Обход сталкерами физ. объектов и открывание/закрывание дверей из ЗП
 
-#endif
+template <class T>
+bool _valid(const _box3<T>& c)
+{
+    return _valid(c.min) && _valid(c.max);
+}
